@@ -27,16 +27,11 @@ router.get('/:productId', getProductById);
 
 
 
-
-
-
-
-
 // Create a new product (admin only)
-// router.post('/', verifyToken, createProduct);
+// router.post('/', verifyToken, upload.array('image') ,createProduct);
 
 // POST route to create a new product with multiple images
-router.post('/', upload.array('image'), createProduct);
+router.post('/', upload.array('images'), createProduct);
 
 
 // Update a product by ID (admin only)

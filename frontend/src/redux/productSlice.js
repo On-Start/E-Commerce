@@ -14,7 +14,7 @@ export const fetchProducts = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await axios.get('http://localhost:8080/products');
-            console.log("response", response.data.products)
+            // console.log("response", response.data.products)
             return response.data.products; // Adjust based on your API response structure
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data.message : error.message);
@@ -28,7 +28,8 @@ export const fetchProductById = createAsyncThunk(
     async (productId, { rejectWithValue }) => {
         try {
             const response = await axios.get(`http://localhost:8080/products/${productId}`);
-            return response.data; // Adjust as per the response structure
+            // console.log(response.data.product)
+            return response.data.product; // Adjust as per the response structure
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data.message : error.message);
         }

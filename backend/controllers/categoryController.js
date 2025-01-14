@@ -3,7 +3,7 @@ const Category = require('../models/category');
 // Get all categories
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.find().populate('parentCategory', 'name');
+        const categories = await Category.find({ }).populate('parentCategory', 'name');
         res.status(200).json({ categories });
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch categories', error: error.message });

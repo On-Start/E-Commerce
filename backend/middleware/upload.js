@@ -1,4 +1,3 @@
-// multerConfig.js
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -12,12 +11,12 @@ if (!fs.existsSync(uploadDir)) {
 // Define storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Store files in the 'uploads/product' directory
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Generate a unique filename based on the timestamp and the file's extension
-    cb(null, Date.now() + path.extname(file.originalname));  // Example: 1623874085132.jpg
+    // Generate a unique filename based on the timestamp and original filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 

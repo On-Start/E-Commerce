@@ -1,15 +1,31 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Typography, Button, Box } from '@mui/material';
-import CheckoutButton from './CheckoutButton';
+// CartSummary.js
+// import React from 'react';
+import { useSelector } from "react-redux";
+import { Typography, Box, Button } from "@mui/material";
 
 const CartSummary = () => {
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const totalAmount = useSelector((state) => state.cartState.totalAmount);
+
+  const handleCheckout = () => {
+    alert("Proceeding to checkout!");
+  };
 
   return (
-    <Box sx={{ my: 3, textAlign: 'right' }}>
-      <Typography variant="h5">Total: ${totalAmount.toFixed(2)}</Typography>
-      <CheckoutButton />
+    <Box
+      sx={{
+        my: 4,
+        textAlign: "right",
+        borderTop: 1,
+        borderColor: "divider",
+        pt: 2,
+      }}
+    >
+      <Typography variant="h5" gutterBottom>
+        Total: ${totalAmount.toFixed(2)}
+      </Typography>
+      <Button variant="contained" color="primary" onClick={handleCheckout}>
+        Proceed to Checkout
+      </Button>
     </Box>
   );
 };

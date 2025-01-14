@@ -68,17 +68,24 @@
 
 const Product = require('../models/product');
 
+
 // Get all products
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find(); // Retrieve all products
-        res.status(200).json({ products });
+        const products = await Product.find().select('name description price category images'); // Select relevant fields
+        const productsWithImageUrls = products.map(product => ({
+            ...product.toObject(),
+            images: product.images.map(image => `${req.protocol}://${req.get('host')}${image}`), // Full URL for each image
+        }));
+
+        res.status(200).json({ products: productsWithImageUrls });
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve products', error: error.message });
     }
 };
 
-// Get a single product by ID
+
+// single product
 exports.getProductById = async (req, res) => {
     const { productId } = req.params;
     try {
@@ -86,7 +93,15 @@ exports.getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json({ product });
+
+        const productWithImageUrls = {
+            ...product.toObject(),  // Use `toObject()` to avoid Mongoose wrapper issues
+            images: product.images.map(image => `${req.protocol}://${req.get('host')}${image}`)
+        };
+        console.log('product.images',typeof(product.images))
+        console.log('product.images (instanceof):', product.images instanceof Array);  // Expected: true
+
+        res.status(200).json({ product: productWithImageUrls });
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving product', error: error.message });
     }
@@ -94,14 +109,16 @@ exports.getProductById = async (req, res) => {
 
 
 
-
 // Controller to handle product creation
 exports.createProduct = async (req, res) => {
     try {
-        console.log("req.body",req.body);
-        console.log('req.file',req.files);
-        // Ensure that files are uploaded
-        if (!req.files) {
+        // Check for required fields
+        const { name, description, price, category } = req.body;
+        if (!name || !description || !price || !category) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'No files uploaded' });
         }
 
@@ -110,23 +127,22 @@ exports.createProduct = async (req, res) => {
 
         // Create a new product in the database
         const newProduct = new Product({
-            name: req.body.name,
-            description: req.body.description,
-            price: req.body.price,
-            category: req.body.category,
-            images: imageUrls,  // Store the image URLs in the database
+            name,
+            description,
+            price,
+            category,
+            images: imageUrls
         });
 
         // Save the product to the database
         await newProduct.save();
-
-        // Send back the created product data
         res.status(201).json(newProduct);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Error creating product' });
+        console.error('Error creating product:', err.message);
+        res.status(500).json({ message: 'Error creating product', error: err.message });
     }
 };
+
 
 
 

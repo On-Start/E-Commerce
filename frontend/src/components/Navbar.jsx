@@ -90,7 +90,7 @@ const Navbar = () => {
         boxShadow: "none",
         color: "text.primary",
         borderBottom: "solid #111111",
-        opacity: "0.8",
+        opacity: "1",
       }}
     >
       <Toolbar

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, TextField, Typography, Container, Box, Paper } from '@mui/material';
+import { Button, TextField, Typography, Container, Box, Paper, Link } from '@mui/material';
 import { login } from '../redux/authSlice';
+import { Link as RouterLink } from 'react-router-dom'; // For routing
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -19,11 +20,12 @@ const Login = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh', // Full viewport height
+        height: '100vh',
+        backgroundColor: '#f5f5f5',
       }}
     >
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4, mt: 6 }}>
+      <Container maxWidth="xs">
+        <Paper elevation={4} sx={{ p: 4 }}>
           <Typography variant="h4" align="center" gutterBottom>
             Login
           </Typography>
@@ -46,9 +48,15 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
               Login
             </Button>
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+              Don’t have an account?{' '}
+              <Link component={RouterLink} to="/signup">
+                Sign up
+              </Link>
+            </Typography>
           </Box>
         </Paper>
       </Container>

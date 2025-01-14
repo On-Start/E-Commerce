@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Import js-cookie
 
 const initialState = {
   user: null,
@@ -12,17 +14,20 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginStart: (state) => {
+    authStart: (state) => {
       state.loading = true;
       state.error = null;
     },
-    loginSuccess: (state, action) => {
+    authSuccess: (state, action) => {
       state.loading = false;
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
+
+      // Store token in cookie
+      Cookies.set('token', action.payload.token, { expires: 1 }); // Cookie expires in 1 day
     },
-    loginFailure: (state, action) => {
+    authFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
       state.isAuthenticated = false;
@@ -31,32 +36,36 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+
+      // Remove token from cookie
+      Cookies.remove('token');
     },
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
+export const { authStart, authSuccess, authFailure, logout } = authSlice.actions;
 
 export const login = (credentials) => async (dispatch) => {
-  dispatch(loginStart());
+  dispatch(authStart());
   try {
-    // Replace with your API call for login
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-    const data = await response.json();
-
-    if (response.ok) {
-      dispatch(loginSuccess({ user: data.user, token: data.token }));
-    } else {
-      dispatch(loginFailure(data.message));
-    }
+    console.log(credentials);
+    const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/auth/login`, credentials);
+    console.log(response.data.user);
+    dispatch(authSuccess({ user: response.data.user, token: response.data.token }));
   } catch (error) {
-    dispatch(loginFailure(error.message));
+    dispatch(authFailure(error.response ? error.response.data.message : 'Login failed.'));
+  }
+};
+
+export const register = (userDetails) => async (dispatch) => {
+  dispatch(authStart());
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/auth/register`, userDetails);
+    console.log(response);
+    dispatch(authSuccess({ user: response.data.user, token: response.data.token }));
+  } catch (error) {
+    console.log(error.response);
+    dispatch(authFailure(error.response ? error.response.data.message : 'Signup failed.'));
   }
 };
 
